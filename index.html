@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Startup Idea Validator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f9f9f9;
+      --surface: #ffffff;
+      --surface2: #f1f1f1;
+      --text: #1a1a1a;
+      --text2: #555;
+      --border: #ddd;
+      --accent: #2563eb;
+      --accent-light: #eff6ff;
+      --danger: #dc2626;
+      --success-bg: #f0fdf4;
+      --success-text: #166534;
+      --warn-bg: #fffbeb;
+      --warn-text: #92400e;
+      --err-bg: #fef2f2;
+      --err-text: #991b1b;
+    }
+
+    body.dark {
+      --bg: #111;
+      --surface: #1e1e1e;
+      --surface2: #2a2a2a;
+      --text: #f1f1f1;
+      --text2: #aaa;
+      --border: #333;
+      --accent: #3b82f6;
+      --accent-light: #1e3a5f;
+      --success-bg: #14532d;
+      --success-text: #bbf7d0;
+      --warn-bg: #451a03;
+      --warn-text: #fde68a;
+      --err-bg: #450a0a;
+      --err-text: #fca5a5;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .app { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .header h1 { font-size: 22px; font-weight: 600; }
+    .dark-btn {
+      font-size: 13px;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+    }
+    .dark-btn:hover { background: var(--surface2); }
+
+    /* STATS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+    .stat-value { font-size: 22px; font-weight: 600; }
+
+    /* TRENDING */
+    .trending-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .section-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+    .trending-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .trending-item {
+      font-size: 12px;
+      padding: 4px 12px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    /* FORM */
+    .form-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-grid.full { grid-template-columns: 1fr; }
+    .form-group label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      resize: vertical;
+      font-family: inherit;
+    }
+    .form-group textarea { min-height: 64px; }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--accent); }
+    .error { color: var(--danger); font-size: 12px; margin-top: 3px; }
+    .submit-btn {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .submit-btn:hover { opacity: 0.9; }
+
+    /* FILTER BAR */
+    .filter-bar {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+    .filter-bar input,
+    .filter-bar select {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      background: var(--surface);
+      color: var(--text);
+      width: 100%;
+      outline: none;
+      font-family: inherit;
+    }
+    .filter-bar input:focus,
+    .filter-bar select:focus { border-color: var(--accent); }
+
+    /* CARDS */
+    .cards-label { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .idea-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      animation: fadeIn 0.3s ease;
+      transition: border-color 0.15s;
+    }
+    .idea-card:hover { border-color: var(--accent); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+    .card-title { font-size: 15px; font-weight: 600; line-height: 1.3; }
+    .upvote-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text2);
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .upvote-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .upvote-btn.voted { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+    .card-desc { font-size: 13px; color: var(--text2); margin-bottom: 12px; line-height: 1.5; }
+    .card-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+    .badge {
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .badge-cat { background: var(--surface2); color: var(--text2); }
+    .badge-easy   { background: var(--success-bg); color: var(--success-text); }
+    .badge-mod    { background: var(--success-bg); color: var(--success-text); }
+    .badge-hard   { background: var(--warn-bg);    color: var(--warn-text); }
+    .badge-vhard  { background: var(--err-bg);     color: var(--err-text); }
+    .badge-ehard  { background: var(--err-bg);     color: var(--err-text); }
+    .badge-mkt-low   { background: var(--surface2); color: var(--text2); }
+    .badge-mkt-med   { background: var(--accent-light); color: var(--accent); }
+    .badge-mkt-high  { background: var(--success-bg); color: var(--success-text); }
+    .badge-mkt-vhigh { background: #f5f3ff; color: #5b21b6; }
+    body.dark .badge-mkt-vhigh { background: #2e1065; color: #c4b5fd; }
+    .popularity { font-size: 11px; color: var(--text2); margin-top: 8px; }
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--text2);
+      font-size: 14px;
+      padding: 2rem;
+    }
+
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .filter-bar { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app" id="root"></div>
+
+<script>
+  const CATEGORIES = ["FinTech","HealthTech","EdTech","CleanTech","AgriTech","RetailTech","LogisticsTech","AI/ML","IoT","Other"];
+  const DIFF_LABELS = { 1:"Easy", 2:"Moderate", 3:"Hard", 4:"Very Hard", 5:"Extremely Hard" };
+  const DIFF_CLASS  = { 1:"easy", 2:"mod",      3:"hard", 4:"vhard",     5:"ehard" };
+  const MKT_OPTIONS = ["Low","Medium","High","Very High"];
+  const MKT_CLASS   = { "Low":"low", "Medium":"med", "High":"high", "Very High":"vhigh" };
+
+  let darkMode = false;
+
+  let state = {
+    ideas: [
+      { id:1, title:"FarmSense AI",  desc:"AI-based crop disease detection via smartphone camera.", problem:"Farmers lack early disease detection tools.", category:"AgriTech",   difficulty:2, market:"High",      votes:5, voted:false },
+      { id:2, title:"MediTrack",     desc:"Unified patient health records accessible across hospitals.", problem:"Medical history is fragmented across providers.", category:"HealthTech", difficulty:4, market:"Very High",  votes:8, voted:false },
+      { id:3, title:"SkillBridge",   desc:"Peer-to-peer skill exchange marketplace for students.", problem:"Students can't easily monetize their skills.", category:"EdTech",     difficulty:2, market:"Medium",    votes:3, voted:false },
+    ],
+    search: "", filterCat: "All", filterDiff: "All", filterMkt: "All",
+    form: { title:"", desc:"", problem:"", category:"FinTech", difficulty:1, market:"Medium" },
+    errors: {},
+    nextId: 4
+  };
+
+  function getStats() {
+    const ideas = state.ideas;
+    if (!ideas.length) return { total: 0, topCat: "—", avgDiff: "—" };
+    const catCount = {};
+    ideas.forEach(i => { catCount[i.category] = (catCount[i.category] || 0) + 1; });
+    const topCat = Object.entries(catCount).sort((a,b) => b[1]-a[1])[0][0];
+    const avgDiff = (ideas.reduce((s,i) => s + i.difficulty, 0) / ideas.length).toFixed(1);
+    return { total: ideas.length, topCat, avgDiff };
+  }
+
+  function getFiltered() {
+    return state.ideas.filter(i => {
+      const q = state.search.toLowerCase();
+      const matchSearch = !q || (i.title.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q) || i.problem.toLowerCase().includes(q));
+      const matchCat  = state.filterCat  === "All" || i.category === state.filterCat;
+      const matchDiff = state.filterDiff === "All" || i.difficulty === parseInt(state.filterDiff);
+      const matchMkt  = state.filterMkt  === "All" || i.market === state.filterMkt;
+      return matchSearch && matchCat && matchDiff && matchMkt;
+    });
+  }
+
+  function getTrending() {
+    return [...state.ideas].sort((a,b) => b.votes - a.votes).slice(0,3);
+  }
+
+  function popularityScore(idea) {
+    const diffScore = (6 - idea.difficulty) * 10;
+    const mktMap = { Low:10, Medium:30, High:60, "Very High":100 };
+    return Math.round((diffScore + (mktMap[idea.market] || 0) + idea.votes * 5) / 3);
+  }
+
+  function validate() {
+    const e = {};
+    const f = state.form;
+    if (!f.title.trim()) e.title = "Title is required";
+    else if (state.ideas.find(i => i.title.toLowerCase() === f.title.trim().toLowerCase())) e.title = "Duplicate title — already exists";
+    if (!f.desc.trim())    e.desc    = "Description is required";
+    if (!f.problem.trim()) e.problem = "Problem statement is required";
+    return e;
+  }
+
+  function submitIdea() {
+    const errors = validate();
+    if (Object.keys(errors).length) { state.errors = errors; render(); return; }
+    const f = state.form;
+    state.ideas.unshift({
+      id: state.nextId++,
+      title: f.title.trim(), desc: f.desc.trim(), problem: f.problem.trim(),
+      category: f.category, difficulty: parseInt(f.difficulty), market: f.market,
+      votes: 0, voted: false
+    });
+    state.form = { title:"", desc:"", problem:"", category:"FinTech", difficulty:1, market:"Medium" };
+    state.errors = {};
+    render();
+  }
+
+  function upvote(id) {
+    const idea = state.ideas.find(i => i.id === id);
+    if (!idea) return;
+    idea.voted = !idea.voted;
+    idea.votes += idea.voted ? 1 : -1;
+    render();
+  }
+
+  function toggleDark() {
+    darkMode = !darkMode;
+    document.body.classList.toggle("dark", darkMode);
+    render();
+  }
+
+  function esc(str) {
+    return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  function render() {
+    const stats    = getStats();
+    const filtered = getFiltered();
+    const trending = getTrending();
+    const f = state.form;
+    const e = state.errors;
+
+    document.getElementById("root").innerHTML = `
+      <div class="header">
+        <h1>Startup Idea Validator</h1>
+        <button class="dark-btn" onclick="toggleDark()">${darkMode ? "Light Mode" : "Dark Mode"}</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Ideas</div>
+          <div class="stat-value">${stats.total}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Top Category</div>
+          <div class="stat-value" style="font-size:16px">${stats.topCat}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Difficulty</div>
+          <div class="stat-value">${stats.avgDiff}</div>
+        </div>
+      </div>
+
+      ${trending.length ? `
+      <div class="trending-section">
+        <div class="section-title">Trending Ideas</div>
+        <div class="trending-list">
+          ${trending.map(i => `<span class="trending-item">${esc(i.title)} &mdash; ${i.votes} votes</span>`).join("")}
+        </div>
+      </div>` : ""}
+
+      <div class="form-section">
+        <div class="section-title">Submit a New Idea</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Startup Title *</label>
+            <input type="text" id="f-title" value="${esc(f.title)}" placeholder="e.g. EcoRide"
+              oninput="state.form.title=this.value; state.errors.title=''; renderPartial()">
+            ${e.title ? `<div class="error">${e.title}</div>` : ""}
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select onchange="state.form.category=this.value">
+              ${CATEGORIES.map(c => `<option${c===f.category?" selected":""}>${c}</option>`).join("")}
+            </select>
+          </div>
+        </div>
+        <div class="form-grid full">
+          <div class="form-group">
+            <label>Short Description *</label>
+            <textarea placeholder="What does your startup do?"
+              oninput="state.form.desc=this.value; state.errors.desc=''">${esc(f.desc)}</textarea>
+            ${e.desc ? `<div class="error">${e.desc}</div>` : ""}
+          </div>
+        </div>
+        <div class="form-grid full">
+          <div class="form-group">
+            <label>Problem Statement *</label>
+            <textarea placeholder="What problem are you solving?"
+              oninput="state.form.problem=this.value; state.errors.problem=''">${esc(f.problem)}</textarea>
+            ${e.problem ? `<div class="error">${e.problem}</div>` : ""}
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Difficulty: ${f.difficulty} &mdash; ${DIFF_LABELS[f.difficulty]}</label>
+            <input type="range" min="1" max="5" step="1" value="${f.difficulty}"
+              oninput="state.form.difficulty=parseInt(this.value); render()">
+          </div>
+          <div class="form-group">
+            <label>Market Potential</label>
+            <select onchange="state.form.market=this.value">
+              ${MKT_OPTIONS.map(m => `<option${m===f.market?" selected":""}>${m}</option>`).join("")}
+            </select>
+          </div>
+        </div>
+        <button class="submit-btn" onclick="submitIdea()">Submit Idea</button>
+      </div>
+
+      <div class="cards-label">All Ideas (${filtered.length})</div>
+      <div class="filter-bar">
+        <input type="text" placeholder="Search by keyword..." value="${esc(state.search)}"
+          oninput="state.search=this.value; render()">
+        <select onchange="state.filterCat=this.value; render()">
+          <option value="All"${state.filterCat==="All"?" selected":""}>All Categories</option>
+          ${CATEGORIES.map(c => `<option${c===state.filterCat?" selected":""}>${c}</option>`).join("")}
+        </select>
+        <select onchange="state.filterDiff=this.value; render()">
+          <option value="All"${state.filterDiff==="All"?" selected":""}>All Difficulties</option>
+          ${[1,2,3,4,5].map(d => `<option value="${d}"${state.filterDiff==d?" selected":""}>${d} &mdash; ${DIFF_LABELS[d]}</option>`).join("")}
+        </select>
+        <select onchange="state.filterMkt=this.value; render()">
+          <option value="All"${state.filterMkt==="All"?" selected":""}>All Markets</option>
+          ${MKT_OPTIONS.map(m => `<option${m===state.filterMkt?" selected":""}>${m}</option>`).join("")}
+        </select>
+      </div>
+
+      <div class="cards-grid">
+        ${filtered.length ? filtered.map(i => `
+          <div class="idea-card">
+            <div class="card-header">
+              <div class="card-title">${esc(i.title)}</div>
+              <button class="upvote-btn${i.voted?" voted":""}" onclick="upvote(${i.id})">&#9650; ${i.votes}</button>
+            </div>
+            <div class="card-desc">${esc(i.desc)}</div>
+            <div class="card-meta">
+              <span class="badge badge-cat">${esc(i.category)}</span>
+              <span class="badge badge-${DIFF_CLASS[i.difficulty]}">${DIFF_LABELS[i.difficulty]}</span>
+              <span class="badge badge-mkt-${MKT_CLASS[i.market]}">${esc(i.market)} Market</span>
+            </div>
+            <div class="popularity">Popularity score: ${popularityScore(i)}</div>
+          </div>
+        `).join("") : `<div class="empty">No ideas match your filters.</div>`}
+      </div>
+    `;
+  }
+
+  function renderPartial() { /* lightweight — just re-render for error clearing */ }
+
+  render();
+</script>
+
+</body>
+</html>
