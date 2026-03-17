@@ -2,7 +2,7 @@
 
 A single-page web application where users can submit startup ideas and explore them on an interactive dashboard.
 
-Built for **Blind Date — Round 1** competition.
+Built for **Tech Event— Round 1** competition.
 
 ---
 
@@ -35,30 +35,6 @@ Built for **Blind Date — Round 1** competition.
 
 ---
 
-## How to Run
-
-No installation or setup required.
-
-1. Clone or download the repository
-2. Open `index.html` in any modern browser
-
-```bash
-git clone https://github.com/your-username/startup-idea-validator.git
-cd startup-idea-validator
-# Just open index.html in your browser
-```
-
----
-
-## Project Structure
-
-```
-startup-idea-validator/
-├── index.html    # Entire application (HTML + CSS + JS in one file)
-└── README.md
-```
-
----
 
 ## How It Works
 
@@ -76,14 +52,11 @@ Where marketScore: Low = 10, Medium = 30, High = 60, Very High = 100
 
 ---
 
-## Screenshots
-
-> Add screenshots here after running the project locally.
-
----
 
 ## Author
 
-**Kshitij Kumar**  
-B.Tech CSE — AI-Driven DevOps  
-Jain University FET
+Built by **Kshitij Kumar**
+
+GitHub: https://github.com/kshitijkumar-dev  
+Email: kshitijkumar.dev@gmail.com  
+LinkedIn: https://www.linkedin.com/in/kshitij-kumar-227a94365
